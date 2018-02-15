@@ -1,6 +1,5 @@
 import * as express from "express";
 import * as bearerToken from "express-bearer-token";
-import * as http from "http";
 
 import { getConfig } from "./config";
 import { initLogger } from "./logging";
@@ -14,6 +13,14 @@ import "./models/transactions";
 const config = getConfig();
 const logger = initLogger(...config.loggers);
 
+// log requestId - in the future will use this to lock the request if needed to
+// resolve race conditions of submitting the same request twice
+function requestIdMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
+	const requestId = req.headers["X-REQUEST-ID"] as string;
+	logger.info(`handling request ${requestId}`);
+	next();
+}
+
 function createApp() {
 	const app = express();
 	app.set("port", config.port);
@@ -25,7 +32,7 @@ function createApp() {
 	const cookieParser = require("cookie-parser");
 	app.use(cookieParser());
 	app.use(bearerToken());
-
+	app.use(requestIdMiddleware);
 	return app;
 }
 
@@ -45,6 +52,7 @@ app.use((req, res, next) => {
 
 // catch errors
 app.use((err, req, res, next) => {
+	logger.error(err.stack);
 	const status = err.status || 500;
 	// log.error(`Error ${status} (${err.message}) on ${req.method} ${req.url} with payload ${req.body}.`);
 	res.status(status).send({ status, error: "Server error" });
@@ -52,58 +60,3 @@ app.use((err, req, res, next) => {
 
 // initializing db and models
 initModels().then(msg => logger.debug(msg));
-
-const server = http.createServer(app);
-server.listen(config.port);
-server.on("error", onError);
-server.on("listening", onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-function normalizePort(val) {
-	const port = parseInt(val, 10);
-
-	if (isNaN(port)) {
-		// named pipe
-		return val;
-	}
-
-	if (port >= 0) {
-		// port number
-		return port;
-	}
-
-	return false;
-}
-
-/**
- * Event listener for HTTP server "error" event.
- */
-function onError(error) {
-	if (error.syscall !== "listen") {
-		throw error;
-	}
-
-	// handle specific listen errors with friendly messages
-	switch (error.code) {
-		case "EACCES":
-			logger.error(`${ config.port } requires elevated privileges`);
-			process.exit(1);
-			break;
-		case "EADDRINUSE":
-			logger.error(`${ config.port } is already in use`);
-			process.exit(1);
-			break;
-		default:
-			throw error;
-	}
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-function onListening() {
-	const addr = server.address();
-	logger.debug(`Listening on ${ addr.port }`);
-}

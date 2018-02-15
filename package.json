@@ -20,11 +20,12 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^7.2.5",
     "@types/body-parser": "^1.16.8",
     "@types/express": "^4.11.0",
+    "@types/jsonwebtoken": "^7.2.5",
     "@types/sequelize": "^4.27.4",
     "@types/winston": "^2.3.7",
+    "jest": "^22.3.0",
     "npm-run-all": "^4.0.1",
     "rimraf": "2.6.1",
     "sqlite3": "3.1.13",
@@ -37,7 +38,7 @@
     "transpile": "tsc -p scripts",
     "lint": "./node_modules/.bin/tslint -p ./scripts",
     "build": "npm-run-all clean lint transpile",
-    "start": "node scripts/bin/index",
+    "start": "node scripts/bin/server",
     "restart": "npm-run-all build start",
     "test": "echo \"Error: no tests yet\" && exit 0"
   },

@@ -6,14 +6,15 @@ import * as db from "../models/users";
 export const router: Router = Router();
 const logger = getLogger();
 
-/**
- * sign in a user
- */
+// TEST FUNCTION - get a user
 router.get("/", async (req, res, next) => {
-	const user = db.User.findOne({ id: "1234" });
+	const user = await db.User.findOne({ id: req.query.id });
 	res.status(200).send({ user });
 });
 
+/**
+ * sign in a user
+ */
 router.post("/", async (req, res, next) => {
 	const { token, activated } = await getOrCreateUserCredentials(
 		req.body.jwt,

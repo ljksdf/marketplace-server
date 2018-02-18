@@ -16,7 +16,7 @@ const logger = initLogger(...config.loggers);
 // log requestId - in the future will use this to lock the request if needed to
 // resolve race conditions of submitting the same request twice
 function requestIdMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
-	const requestId = req.headers["X-REQUEST-ID"] as string;
+	const requestId = req.headers["x-request-id"] as string;
 	logger.info(`handling request ${requestId}`);
 	next();
 }

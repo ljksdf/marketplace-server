@@ -49,13 +49,24 @@ app.use((req, res, next) => {
 	// log.error(`Error 404 on ${req.url}.`);
 	res.status(404).send({ status: 404, error: "Not found" });
 });
+//
+// // catch errors
+// app.use((err, req, res, next) => {
+// 	logger.error(err.stack);
+// 	const status = err.status || 500;
+// 	// log.error(`Error ${status} (${err.message}) on ${req.method} ${req.url} with payload ${req.body}.`);
+// 	res.status(status).send({ status, error: "Server error" });
+// });
 
-// catch errors
-app.use((err, req, res, next) => {
-	logger.error(err.stack);
-	const status = err.status || 500;
-	// log.error(`Error ${status} (${err.message}) on ${req.method} ${req.url} with payload ${req.body}.`);
-	res.status(status).send({ status, error: "Server error" });
+// production error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+	if (res.headersSent) {
+		return next(err);
+	}
+	logger.error(`Error (${err.message}) on ${req.method} ${req.url} with payload ${req.body}.`);
+
+	const status = 500;
+	res.status(status).send({ status, error: err.message });
 });
 
 // initializing db and models

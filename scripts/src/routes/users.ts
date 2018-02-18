@@ -12,6 +12,11 @@ router.get("/", async (req, res, next) => {
 	res.status(200).send({ user });
 });
 
+// TEST FUNCTION - raise error
+router.get("/error", async (req, res, next) => {
+	throw new Error("this is an error message");
+});
+
 /**
  * sign in a user
  */

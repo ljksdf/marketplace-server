@@ -70,4 +70,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // initializing db and models
-initModels().then(msg => logger.debug(msg));
+initModels().then(msg => {
+	logger.debug(msg);
+	app.emit("initModels");
+} );

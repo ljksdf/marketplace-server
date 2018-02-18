@@ -2,6 +2,8 @@ import { ConnectionOptions } from "typeorm";
 
 import { LogTarget } from "./logging";
 
+import * as path from "path";
+
 export interface Config {
 	port?: number;
 	loggers?: LogTarget[];

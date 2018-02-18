@@ -50,7 +50,10 @@ export function init(): Promise<string> {
 
 	return createConnection(dbConfig)
 		.then(connection => {
-			return createOnConnectedString(connection.options);
+			console.log("initing models");
+			const res = createOnConnectedString(connection.options);
+			console.log("finished init");
+			return res;
 		})
 		.catch(error => {
 			return normalizeError(error);
